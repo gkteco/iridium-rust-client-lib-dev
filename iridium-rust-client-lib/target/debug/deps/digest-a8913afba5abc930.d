@@ -1,0 +1,11 @@
+C:\Users\giann\RustroverProjects\iridium-rust-client-dev\iridium-rust-client-lib\target\debug\deps\digest-a8913afba5abc930.rmeta: C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\lib.rs C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\digest.rs C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\dyn_digest.rs C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\errors.rs C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\fixed.rs C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\variable.rs C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\xof.rs
+
+C:\Users\giann\RustroverProjects\iridium-rust-client-dev\iridium-rust-client-lib\target\debug\deps\digest-a8913afba5abc930.d: C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\lib.rs C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\digest.rs C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\dyn_digest.rs C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\errors.rs C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\fixed.rs C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\variable.rs C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\xof.rs
+
+C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\lib.rs:
+C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\digest.rs:
+C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\dyn_digest.rs:
+C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\errors.rs:
+C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\fixed.rs:
+C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\variable.rs:
+C:\Users\giann\.cargo\registry\src\index.crates.io-6f17d22bba15001f\digest-0.9.0\src\xof.rs:
