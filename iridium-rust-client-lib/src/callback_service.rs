@@ -3,10 +3,27 @@ pub mod callback_service {
     use reqwest::StatusCode;
     use serde::{Deserialize, Serialize};
     use std::collections::HashMap;
+    use std::ops::Bound::Included;
+    use warp::http::Response;
+    use warp::reply::Json;
 
     #[derive(Deserialize, Serialize, Debug)]
-    struct TokenResponse {
+    pub struct TokenResponse {
         access_token: String,
+    }
+    #[derive(Deserialize, Serialize, Debug)]
+   pub struct UserID {
+        token: String
+    }
+
+    impl warp::Reply for UserID {
+        fn into_response(self) -> warp::reply::Response {
+            let user = UserID {
+                token: self.token
+            };
+            let json = warp::reply::json(&user);
+            json.into_response()
+        }
     }
     pub async fn handle_callback(
         params: HashMap<String, String>,
@@ -15,14 +32,13 @@ pub mod callback_service {
         if let (Some(code), Some(state)) = (params.get("code"), params.get("state")) {
             let client = reqwest::Client::new();
             let exchange_url = exchange_url::generate(code, state, &verifier);
-            println!("exchange_url: {}", exchange_url);
             let headers = exchange_headers::generate();
 
             match client.post(&exchange_url).headers(headers).send().await {
                 Ok(response) if response.status() == StatusCode::OK => {
-                    let json = response.json::<TokenResponse>().await.unwrap();
+                    let json = response.json::<UserID>().await.unwrap();
 
-                    Ok(warp::reply::json(&json))
+                    Ok(json)
                 }
                 Ok(response) => {
                     eprintln!("Unexpected response status: {}", response.status());

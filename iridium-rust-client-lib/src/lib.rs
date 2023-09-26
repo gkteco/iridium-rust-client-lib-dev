@@ -10,7 +10,12 @@ use std::env;
 use std::str::FromStr;
 use tokio;
 use warp::http::{HeaderMap, Uri};
-use warp::Filter;
+use warp::{Filter};
+use warp::Reply;
+
+
+
+
 
 #[tokio::main]
 pub async fn authenticate_with_external_redirect() -> () {
@@ -35,7 +40,8 @@ pub async fn authenticate_with_external_redirect() -> () {
             .and(warp::query::<HashMap<String, String>>())
             .and_then(move |params: HashMap<String, String>| {
                 callback_service::callback_service::handle_callback(params, verifier.clone())
-            });
+            }
+            );
 
         let routes = auth.or(callback);
 
