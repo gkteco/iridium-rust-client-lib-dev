@@ -471,6 +471,8 @@ name = "iridium-rust-client-dev"
 version = "0.1.0"
 dependencies = [
  "iridium-rust-client-lib",
+ "tokio",
+ "warp",
 ]
 
 [[package]]

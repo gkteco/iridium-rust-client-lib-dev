@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 iridium-rust-client-lib = { path = "./iridium-rust-client-lib" }
+warp = "0.3.5"
+tokio = "1.32.0"
+

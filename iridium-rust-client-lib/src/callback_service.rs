@@ -13,7 +13,7 @@ pub mod callback_service {
     }
     #[derive(Deserialize, Serialize, Debug)]
    pub struct UserID {
-        token: String
+        pub token: String
     }
 
     impl warp::Reply for UserID {
@@ -28,7 +28,7 @@ pub mod callback_service {
     pub async fn handle_callback(
         params: HashMap<String, String>,
         verifier: String,
-    ) -> Result<impl warp::Reply, warp::Rejection> {
+    ) -> Result<UserID, warp::Rejection> {
         if let (Some(code), Some(state)) = (params.get("code"), params.get("state")) {
             let client = reqwest::Client::new();
             let exchange_url = exchange_url::generate(code, state, &verifier);
@@ -36,9 +36,12 @@ pub mod callback_service {
 
             match client.post(&exchange_url).headers(headers).send().await {
                 Ok(response) if response.status() == StatusCode::OK => {
-                    let json = response.json::<UserID>().await.unwrap();
+                    let token = response.json::<TokenResponse>().await.unwrap();
+                    let user_id = UserID {
+                        token: token.access_token
+                    };
+                    Ok(user_id)
 
-                    Ok(json)
                 }
                 Ok(response) => {
                     eprintln!("Unexpected response status: {}", response.status());

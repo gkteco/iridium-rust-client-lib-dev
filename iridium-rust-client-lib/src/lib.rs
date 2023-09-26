@@ -1,4 +1,4 @@
-mod callback_service;
+pub mod callback_service;
 mod pkce_service;
 mod state_generator_service;
 mod token_service;
@@ -8,17 +8,61 @@ use rand::Rng;
 use std::collections::HashMap;
 use std::env;
 use std::str::FromStr;
+use reqwest::StatusCode;
+use serde::{Deserialize, Serialize};
 use tokio;
 use warp::http::{HeaderMap, Uri};
-use warp::{Filter};
+use warp::{Error, Filter};
 use warp::Reply;
+use warp::reply::Response;
 
 
+#[derive(Deserialize, Serialize, Debug)]
+pub struct  User {
+    pub code: String,
+    pub message: String,
+    pub data: Data,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct Data {
+    pub id: String,
+    pub username: String,
+    pub profile: Option<String>,
+    pub userToken: Option<String>,
+    pub roles: Vec<String>,
+    pub tenantIds: Vec<String>,
+}
+
+impl warp::Reply for User {
+    fn into_response(self) -> warp::reply::Response {
+        let user = User {
+            code: self.code,
+            message: self.message,
+            data: self.data,
+        };
+        let json = warp::reply::json(&user);
+        json.into_response()
+    }
+}
+
+impl warp::Reply for Data {
+    fn into_response(self) -> warp::reply::Response {
+        let data = Data {
+            id: self.id,
+            username: self.username,
+            profile: self.profile,
+            userToken: self.userToken,
+            roles: self.roles,
+            tenantIds: self.tenantIds,
+        };
+        let json = warp::reply::json(&data);
+        json.into_response()
+    }
+}
 
 
-
-#[tokio::main]
-pub async fn authenticate_with_external_redirect() -> () {
+pub async fn authenticate_with_external_redirect() -> Option<String> {
     let state = state_generator_service::state_generator::generate();
     let verifier = generate_random_string();
     let pkce_code = pkce_service::pkce_service::generate_code_challenge(&verifier);
@@ -35,23 +79,17 @@ pub async fn authenticate_with_external_redirect() -> () {
             warp::redirect(uri)
         });
 
-        //call back
-        let callback = warp::path!("callback")
-            .and(warp::query::<HashMap<String, String>>())
-            .and_then(move |params: HashMap<String, String>| {
-                callback_service::callback_service::handle_callback(params, verifier.clone())
-            }
-            );
 
-        let routes = auth.or(callback);
 
-        warp::serve(routes).run(([127, 0, 0, 1], 8080)).await;
+        warp::serve(auth).run(([127, 0, 0, 1], 8080)).await;
+        Some(verifier)
     } else {
-        eprintln!("Error generating code challenge")
+        eprintln!("Error generating code challenge");
+        None
     }
 }
 
-pub async fn get_identity(token: &str) -> Result<reqwest::Response, reqwest::Error> {
+pub async fn get_identity(token: &str) -> Result<User, warp::Rejection> {
     let client = reqwest::Client::new();
     let base_url = env::var("RUST_IRIDIUM_BASE_URL").expect("RUST_IRIDIUM_BASE_URL must be set");
     let identities_url = format!("{}identities", base_url);
@@ -66,7 +104,21 @@ pub async fn get_identity(token: &str) -> Result<reqwest::Response, reqwest::Err
 
     headers.insert("Authorization", bearer.parse().unwrap());
 
-    client.get(&identities_url).headers(headers).send().await
+   match client.get(&identities_url).headers(headers).send().await {
+       Ok(response) if response.status() == StatusCode::OK => {
+           let res = serde_json::from_str::<User>(&response.text().await.unwrap());
+           println!("{:?}", res);
+              Ok(res.unwrap())
+       }
+         Ok(response) => {
+              eprintln!("Unexpected response status: {}", response.status());
+              Err(warp::reject())
+         }
+            Err(e) => {
+                eprintln!("Error making request: {}", e);
+                Err(warp::reject())
+            }
+   }
 }
 fn generate_random_string() -> String {
     let random_string: String = rand::thread_rng()
