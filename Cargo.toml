@@ -5,6 +5,7 @@ authors = ["Gianni Crivello <gianni@iridium.software>"]
 description = "An Iridium client library written in Rust"
 license = "MIT"
 repository = "https://github.com/IridiumIdentity/iridium"
+edition = "2021"
 
 
 [dependencies]

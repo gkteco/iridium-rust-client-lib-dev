@@ -467,7 +467,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "28b29a3cd74f0f4598934efe3aeba42bae0eb4680554128851ebbecb02af14e6"
 
 [[package]]
-name = "iridium-rust-client"
+name = "iridium-client"
 version = "0.1.0"
 dependencies = [
  "base64 0.13.1",
