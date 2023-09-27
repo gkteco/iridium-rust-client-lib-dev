@@ -29,13 +29,16 @@ pub mod callback_service {
         params: HashMap<String, String>,
         verifier: String,
     ) -> Result<UserID, warp::Rejection> {
+        println!("in handle callback");
         if let (Some(code), Some(state)) = (params.get("code"), params.get("state")) {
             let client = reqwest::Client::new();
             let exchange_url = exchange_url::generate(code, state, &verifier);
             let headers = exchange_headers::generate();
+            println!("in handle callback");
 
             match client.post(&exchange_url).headers(headers).send().await {
                 Ok(response) if response.status() == StatusCode::OK => {
+                    println!("handle in match");
                     let token = response.json::<TokenResponse>().await.unwrap();
                     let user_id = UserID {
                         token: token.access_token

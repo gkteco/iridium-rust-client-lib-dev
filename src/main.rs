@@ -7,14 +7,19 @@ use iridium_rust_client_lib::User;
 
 #[tokio::main]
 async fn main() {
-    let verifier = authenticate_with_external_redirect().await.unwrap();
-
-
+    let verifier = iridium_rust_client_lib::generate_random_string();
+    let auth_verifier = verifier.clone();
+    let callback_verifier = verifier.clone();
+    //authenticate
+    let auth = warp::path!("auth").map( move || {
+        let uri = authenticate_with_external_redirect(auth_verifier.clone()).unwrap();
+        warp::redirect(uri)
+    });
     //call back
     let callback = warp::path!("callback")
         .and(warp::query::<HashMap<String, String>>())
         .and_then(move |params: HashMap<String, String>| {
-            let response = callback_service::callback_service::handle_callback(params, verifier.clone());
+            let response = callback_service::callback_service::handle_callback(params, callback_verifier.clone());
             async {
                 if let Ok(res) = response.await {
                     if let Ok(user) = get_identity(&res.token).await {
@@ -32,5 +37,8 @@ async fn main() {
             }
         }
         );
-    warp::serve(callback).run(([127, 0, 0, 1], 8080)).await;
+
+    let routes = auth.or(callback);
+
+    warp::serve(routes).run(([127, 0, 0, 1], 8080)).await;
 }

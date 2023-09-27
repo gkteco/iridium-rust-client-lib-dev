@@ -62,27 +62,19 @@ impl warp::Reply for Data {
 }
 
 
-pub async fn authenticate_with_external_redirect() -> Option<String> {
+pub fn authenticate_with_external_redirect(verifier: String) -> Option<Uri>   {
     let state = state_generator_service::state_generator::generate();
-    let verifier = generate_random_string();
     let pkce_code = pkce_service::pkce_service::generate_code_challenge(&verifier);
 
     if let Ok(code_challenge) = pkce_code {
-        let auth = warp::path!("auth").map(move || {
-            let uri = Uri::from_str(
-                &url_generator_service::url_generator_service::get_iridium_auth_url(
+        let uri = Uri::from_str(
+            &url_generator_service::url_generator_service::get_iridium_auth_url(
                     &state,
                     &code_challenge,
                 ),
             )
             .unwrap();
-            warp::redirect(uri)
-        });
-
-
-
-        warp::serve(auth).run(([127, 0, 0, 1], 8080)).await;
-        Some(verifier)
+        Some(uri)
     } else {
         eprintln!("Error generating code challenge");
         None
@@ -120,7 +112,7 @@ pub async fn get_identity(token: &str) -> Result<User, warp::Rejection> {
             }
    }
 }
-fn generate_random_string() -> String {
+pub fn generate_random_string() -> String {
     let random_string: String = rand::thread_rng()
         .sample_iter(&rand::distributions::Alphanumeric)
         .take(32)
